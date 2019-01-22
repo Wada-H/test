@@ -6,8 +6,8 @@ ImageJのplugin
 FRET画像(例 : ch1 -> CFP, ch2 -> CFP-YFP など)のピクセル毎の比を計算し、その値で画像を作る  
 大きな特徴として、IMD形式に対応している。(Lutファイルは別途ダウンロード)
 
-Original Lut files 
-https://signaling.riken.jp/tools/imagej-plugins/488/
+Original Lut files  
+https://signaling.riken.jp/tools/imagej-plugins/488/  
 
 ***** This repository is test case, so it seems to be incomplete *******  
 
