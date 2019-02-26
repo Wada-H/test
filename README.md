@@ -1,5 +1,5 @@
 # FRETratioFx
-ImageJ plugin for creating FRET ratio
+ImageJ plugin for creating FRET ratio image
 
 
 This version is fixed two probrems
