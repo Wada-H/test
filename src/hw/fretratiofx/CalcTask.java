@@ -2,7 +2,6 @@ package hw.fretratiofx;
 
 import ij.ImagePlus;
 import ij.ImageStack;
-import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
 import javafx.concurrent.Task;
 

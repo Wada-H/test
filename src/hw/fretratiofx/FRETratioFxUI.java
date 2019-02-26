@@ -56,6 +56,8 @@ public class FRETratioFxUI extends AnchorPane implements WindowListener {
     @FXML public Button bProjection; //projection用ボタン
     @FXML public Button bClear; //画像初期化用ボタン
     @FXML public CheckBox cbAutoCutBackground; //バックグランド差し引きようcheckbox
+    @FXML public ChoiceBox<String> cbMethods;
+    ObservableList<String> cbMethodsList = FXCollections.observableArrayList("Ave","Mod");
     @FXML public TextField tfAutoCut; //AutoCut用　拡張値入力領域
     @FXML public CheckBox  cbAutoEnhance; // AutoEnhance用checkbox
     @FXML public CheckBox  cbSubtract; //background差し引き方
@@ -144,6 +146,9 @@ public class FRETratioFxUI extends AnchorPane implements WindowListener {
 
         });
 
+        cbMethods.setItems(cbMethodsList);
+        cbMethods.setValue(cbMethodsList.get(1));
+
     }
 
 
@@ -231,12 +236,19 @@ public class FRETratioFxUI extends AnchorPane implements WindowListener {
 
         if(mouseEvent.getClickCount() == 1) {
 
+            ImagePlus buff = new ImagePlus();
+
             if (cbAutoCutBackground.isSelected() == true) {
                 double ext_num = Double.valueOf(tfAutoCut.getText());
 
                 AutoCut autoCut = new AutoCut(processingImage);
                 autoCut.setSelfSlice(cbSubtract.isSelected());
-                autoCut.autocut(1, ext_num);
+                int methodOption = 0;
+                if(cbMethods.getValue() == cbMethodsList.get(1)){
+                    methodOption = 1;
+                }
+                autoCut.autocut(methodOption, ext_num);
+
                 processingImage.setRoi(r);
             }
 

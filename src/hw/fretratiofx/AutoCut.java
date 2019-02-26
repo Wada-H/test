@@ -20,9 +20,16 @@ public class AutoCut {
 
 
     public void autocut(int selected_method_id, double ext_num){
+        int current_c = imp.getC();
+        int current_z = imp.getZ();
+        int current_t = imp.getT();
+        int c = imp.getNChannels();
+        int z = imp.getNSlices();
 
-        //int stackIndex = (current_t - 1) * c * z + ((current_c - 1) * z) + (current_z);
-        ImagePlus currentSliceImage = this.duplicate1slice(imp, imp.getCurrentSlice());
+
+        int stackIndex = (current_t - 1) * c * z + ((current_c - 1) * z) + (current_z);
+
+        ImagePlus currentSliceImage = this.duplicate1slice(imp, stackIndex);
 
         //* 並び順が違う場合もok?
         final int peak_value;
@@ -33,24 +40,28 @@ public class AutoCut {
         }
 
 
+        ImagePlus new_img = imp.duplicate();
+        imp.setRoi(roi);
+
         IntStream i_steram = IntStream.range(0, imp.getStackSize());
 
         i_steram.parallel().forEach(i ->{
             int p_value = peak_value;
 
-            if(selfSlice){
-                ImagePlus buffImage = this.duplicate1slice(imp, (i+1));
+            if (selfSlice) {
+                ImagePlus buffImage = this.duplicate1slice(imp, (i + 1));
                 p_value = getSubtractionValue(buffImage.getProcessor(), selected_method_id);
-
-            }else{
+            } else {
                 //何もしない？
             }
 
             double subtract_value = p_value * ext_num;
-            ImageProcessor ip = imp.getStack().getProcessor(i+1);
+            //System.out.println("subtract:" + subtract_value);
+            ImageProcessor ip = new_img.getStack().getProcessor(i + 1);
             ip.subtract(subtract_value);
-
         });
+        new_img.setFileInfo(imp.getOriginalFileInfo());
+        imp.setImage(new_img);
     }
 
     public void setSelfSlice(boolean b){
@@ -88,7 +99,8 @@ public class AutoCut {
                 }
             }
 
-            int limit = (hist_array.length / depth) - 1; // backgroundとして認める最大値
+            //int limit = (hist_array.length / depth) - 1; // backgroundとして認める最大値 ->これにすると輝度が高い方にシフトしたような場合に対応できない。
+            int limit = hist_array.length;
 
             for(int i = 1; i < limit; i++){ //0を無視するため i = 1から
                 int value = hist_array[i];

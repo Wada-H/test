@@ -13,12 +13,12 @@
    <children>
       <Pane prefHeight="270.0" prefWidth="400.0">
          <children>
-            <TextField fx:id="tfAutoCut" layoutX="219.0" layoutY="27.0" text="1.0" />
+            <TextField fx:id="tfAutoCut" layoutX="327.0" layoutY="27.0" prefHeight="27.0" prefWidth="59.0" text="1.0" />
             <ChoiceBox fx:id="cbFormula" layoutX="15.0" layoutY="132.0" prefHeight="27.0" prefWidth="370.0" />
             <Button fx:id="bProjection" layoutX="14.0" layoutY="222.0" mnemonicParsing="false" onMouseReleased="#projectionButtonFunction" text="Projection" />
             <Button fx:id="bClear" layoutX="159.0" layoutY="222.0" mnemonicParsing="false" onMouseReleased="#clearButtonFunction" prefHeight="27.0" prefWidth="80.0" text="Clear" />
             <Button fx:id="bCalc" layoutX="302.0" layoutY="222.0" mnemonicParsing="false" onMouseReleased="#calcButtonFunction" prefHeight="27.0" prefWidth="80.0" text="Calc" />
-            <CheckBox fx:id="cbAutoCutBackground" layoutX="14.0" layoutY="32.0" mnemonicParsing="false" selected="true" text="AutoCutB. Ext. value" />
+            <CheckBox fx:id="cbAutoCutBackground" layoutX="14.0" layoutY="32.0" mnemonicParsing="false" selected="true" text="AutoCutB" />
             <CheckBox fx:id="cbSubtract" layoutX="14.0" layoutY="66.0" mnemonicParsing="false" selected="true" text="Subtract background from self slice" />
             <CheckBox fx:id="cbAutoEnhance" layoutX="14.0" layoutY="100.0" mnemonicParsing="false" text="AutoEnhance" />
             <StackPane layoutX="14.0" layoutY="169.0" prefHeight="39.0" prefWidth="370.0">
@@ -40,6 +40,9 @@
                   </Pane>
                </children>
             </StackPane>
+            <Label layoutX="257.0" layoutY="32.0" text="Ext. value" />
+            <Label layoutX="119.0" layoutY="32.0" text="Method" />
+            <ChoiceBox fx:id="cbMethods" layoutX="176.0" layoutY="27.0" prefHeight="27.0" prefWidth="71.0" />
          </children>
       </Pane>
    </children>

@@ -18,6 +18,7 @@ Calcボタンを押すたびに元画像と、式をもとに新しい画像を�
 20150113 project start
 20180921 refactoring start, UIをJavaFxに変更予定
 20181107 UIの変更ほぼ完成, これに伴うrefactoringを行う予定
+20190226 AutoCut部分にMethodの追加とModの修正
 
 @author    hwada
 
@@ -43,7 +44,7 @@ import java.awt.event.WindowListener;
 
 public class FRETratioFx_ extends PlugInFrame implements WindowListener {
 
-    static String version = "20181107";
+    static String version = "20190226";
     FRETratioFxUI ui;
 
     ImagePlus mainImage; // 元画像 または選択中の画像
