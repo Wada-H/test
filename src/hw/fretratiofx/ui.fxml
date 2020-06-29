@@ -4,14 +4,16 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 
-<fx:root prefHeight="270.0" prefWidth="400.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root prefHeight="270.0" prefWidth="400.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Pane prefHeight="270.0" prefWidth="400.0">
+      <Pane prefHeight="280.0" prefWidth="400.0">
          <children>
             <TextField fx:id="tfAutoCut" layoutX="327.0" layoutY="27.0" prefHeight="27.0" prefWidth="59.0" text="1.0" />
             <ChoiceBox fx:id="cbFormula" layoutX="15.0" layoutY="132.0" prefHeight="27.0" prefWidth="370.0" />
@@ -36,6 +38,22 @@
                         <Label layoutX="185.0" layoutY="11.0" text="Max Ratio : " />
                         <TextField fx:id="minRatioField" layoutX="82.0" layoutY="6.0" prefHeight="27.0" prefWidth="80.0" text="0.25" />
                         <TextField fx:id="maxRatioField" layoutX="256.0" layoutY="6.0" prefHeight="27.0" prefWidth="80.0" text="1.0" />
+                     </children>
+                  </Pane>
+                  <Pane fx:id="calc4Pane" prefHeight="200.0" prefWidth="200.0" visible="false">
+                     <children>
+                        <RadioButton fx:id="radioAutoHSB" layoutY="11.0" mnemonicParsing="false" selected="true" text="Auto">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="changeAorM" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="radioManualHSB" layoutX="60.0" layoutY="11.0" mnemonicParsing="false" text="Manual" toggleGroup="$changeAorM" />
+                        <TextField fx:id="minRatioFieldHSB" layoutX="170.0" layoutY="6.0" prefHeight="27.0" prefWidth="53.0" text="0.0" />
+                        <TextField fx:id="maxRatioFieldHSB" layoutX="260.0" layoutY="6.0" prefHeight="27.0" prefWidth="53.0" text="1.0" />
+                        <TextField fx:id="colorDividingNum" layoutX="330.0" layoutY="6.0" prefHeight="27.0" prefWidth="40.0" text="0" />
+                        <Label layoutX="140.0" layoutY="11.0" text="Min:" />
+                        <Label layoutX="225.0" layoutY="11.0" prefHeight="17.0" prefWidth="40.0" text="Max:" />
+                        <Label layoutX="315.0" layoutY="11.0" text="C:" />
                      </children>
                   </Pane>
                </children>

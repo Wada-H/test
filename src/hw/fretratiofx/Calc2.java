@@ -12,6 +12,12 @@ public class Calc2 extends Calc{
     }
 
     @Override
+    public String getTitle(){
+        title = "_exv" + exValue;
+        return title;
+    }
+
+    @Override
     public ImageProcessor getProcessor(ImageProcessor a, ImageProcessor b){
 
 

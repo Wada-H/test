@@ -14,11 +14,19 @@ panelにbackguroundを差し引く用のcheckbox(基本的にはONで)
 projection機能も(max and mean)
 Calcボタンを押すたびに元画像と、式をもとに新しい画像を作る
 
+
 更新履歴
 20150113 project start
 20180921 refactoring start, UIをJavaFxに変更予定
 20181107 UIの変更ほぼ完成, これに伴うrefactoringを行う予定
 20190226 AutoCut部分にMethodの追加とModの修正
+20190403 ImageJ 1.52nでのduplicate()仕様変更による修正 *AutoCut, FRETratioFxUI
+20190819 HSB colorを用いたratio表示(IMD)を追加。できああがる画像はRGBとなる。
+20191113 HSB colorの改良 brightness 0.1以上を用いて枚数を数え、これで各累計値を割る。ROIを設定することでその中の最大最小を用いてRatioを決める
+20191114 T軸に対して並列に計算することで処理速度を改善。
+    *問題点発覚 - stack全体としての最大輝度最小輝度をみる必要があるのではないかということ。
+        ->色々試すも結局ちらつくので保留。あとはHSBprojection後に全体の輝度を揃えるようなやりかたか。(AutoEnhance的な)
+
 
 @author    hwada
 
@@ -44,7 +52,7 @@ import java.awt.event.WindowListener;
 
 public class FRETratioFx_ extends PlugInFrame implements WindowListener {
 
-    static String version = "20190226";
+    static String version = "20191115";
     FRETratioFxUI ui;
 
     ImagePlus mainImage; // 元画像 または選択中の画像

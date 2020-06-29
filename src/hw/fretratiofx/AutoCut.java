@@ -6,6 +6,12 @@ import ij.process.ImageProcessor;
 
 import java.util.stream.IntStream;
 
+/**
+ * 2019.04.03
+ *  ImageJ 1.52nのduplicate()仕様変更による修正
+ *
+ */
+
 public class AutoCut {
 
     ImagePlus imp;
@@ -119,7 +125,8 @@ public class AutoCut {
         ImagePlus resultimg = new ImagePlus();
         resultimg.setProcessor(buffip);
         resultimg.setRoi(roi);
-        return resultimg.duplicate();
+        //return resultimg.duplicate();
+        return resultimg.crop();
     }
 
 

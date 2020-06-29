@@ -12,6 +12,8 @@ public class Calc1 extends Calc{
         int height = a.getHeight();
 
         ImageProcessor return_imp = a.duplicate();
+
+
         double bitMaxValue = Math.pow(2.0, (double)bit_depth);
 
 

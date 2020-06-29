@@ -3,12 +3,15 @@ package hw.fretratiofx;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.Roi;
+import ij.plugin.Duplicator;
 import ij.plugin.HyperStackConverter;
+import ij.process.ImageProcessor;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.embed.swing.JFXPanel;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,6 +24,10 @@ import javafx.scene.layout.Pane;
 import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class FRETratioFxUI extends AnchorPane implements WindowListener {
 
@@ -49,7 +56,7 @@ public class FRETratioFxUI extends AnchorPane implements WindowListener {
     Scene scene;
     JFXPanel jfxPanel;
     FXMLLoader loader;
-
+    ProgressBar progressBar;
 
 
     @FXML public Button bCalc; //計算用ボタン
@@ -63,16 +70,25 @@ public class FRETratioFxUI extends AnchorPane implements WindowListener {
     @FXML public CheckBox  cbSubtract; //background差し引き方
 
     @FXML private ChoiceBox<String> cbFormula;
-    ObservableList<String> cbFormulaList = FXCollections.observableArrayList("Obtain(divide 100 <=) then ch2 / (ch1 + ch2) * bitMaxValue.","ch2 / ch1 * 100 * exValue","Like IMD(should set Lut 'LIMD')");
+    ObservableList<String> cbFormulaList = FXCollections.observableArrayList("Obtain(divide 100 <=) then ch2 / (ch1 + ch2) * bitMaxValue.","ch2 / ch1 * 100 * exValue","Like IMD(should set Lut 'LIMD')","IMDwithHSB");
 
     @FXML public Pane calc1Pane;
     @FXML public Pane calc2Pane;
     @FXML public Pane calc3Pane;
+    @FXML public Pane calc4Pane;
 
     @FXML public TextField extendValueField;
     @FXML public TextField minRatioField;
     @FXML public TextField maxRatioField;
 
+
+    @FXML public RadioButton radioAutoHSB;
+    @FXML public RadioButton radioManualHSB;
+
+    @FXML public TextField minRatioFieldHSB;
+    @FXML public TextField maxRatioFieldHSB;
+
+    @FXML public TextField colorDividingNum;
 
     public FRETratioFxUI(ImagePlus img, String file_name){
         fileName = file_name;
@@ -137,6 +153,7 @@ public class FRETratioFxUI extends AnchorPane implements WindowListener {
         paneList.add(calc1Pane);
         paneList.add(calc2Pane);
         paneList.add(calc3Pane);
+        paneList.add(calc4Pane);
 
         cbFormula.setItems(cbFormulaList);
         cbFormula.setValue(cbFormulaList.get(0));
@@ -178,6 +195,7 @@ public class FRETratioFxUI extends AnchorPane implements WindowListener {
     public ImagePlus fretCalc(int num){ //元はswingworker使用 -> Taskへ変更予定
 
 
+        ///*
         Service<ImagePlus> service  = new Service<ImagePlus>() {
 
             Task<ImagePlus> resultTask;
@@ -186,6 +204,15 @@ public class FRETratioFxUI extends AnchorPane implements WindowListener {
                 resultTask = new CalcTask(processingImage, num);
 
                 System.out.println("num : " + num);
+
+                /* //stack全体からmax, minを決定
+                SearchMaxMin searchMaxMin = new SearchMaxMin(processingImage);
+                searchMaxMin.searchMaxMin();
+                double minIntensity = searchMaxMin.getMin();
+                double maxIntensity = searchMaxMin.getMax();
+                */
+                //System.out.println("intensity min max : " + minIntensity + ", " + maxIntensity);
+
                 // ダイアログみないなのだして入力させる? -> IJ.getNumber()ではだめっぽい ->UI　panelを変更 してみるか//
                 if(num == 1){
                     int exValue = Integer.valueOf(extendValueField.getText());
@@ -194,9 +221,18 @@ public class FRETratioFxUI extends AnchorPane implements WindowListener {
                     double min = Double.valueOf(minRatioField.getText());
                     double max = Double.valueOf(maxRatioField.getText());
                     ((CalcTask) resultTask).setRatio(min, max);
+                }else if(num == 3){
+                    double min = Double.valueOf(minRatioFieldHSB.getText());
+                    double max = Double.valueOf(maxRatioFieldHSB.getText());
+                    int dividingNum = Integer.valueOf(colorDividingNum.getText());
+                    int mod = 0;
+                    if(radioManualHSB.isSelected()){
+                        mod = 1;
+                    }
+                    ((CalcTask) resultTask).setCalcHSB(min, max, mod, dividingNum);
+                    //((CalcTask) resultTask).setMinMaxIntensity(minIntensity, maxIntensity);
                 }
                 resultTask.run();
-
                 return resultTask;
             };
 
@@ -212,8 +248,10 @@ public class FRETratioFxUI extends AnchorPane implements WindowListener {
         if((z == 1)&&(t == 1)){
             return_hyper = return_imp;
         }else if(return_imp.getBitDepth() == 24){ //RGBの場合どうする？20150316　未完
+            //return_hyper = HyperStackConverter.toHyperStack(return_imp, 3, z, t, "default", "color");
+            return_hyper = return_imp;
 
-            return_hyper = HyperStackConverter.toHyperStack(return_imp, 3, z, t, "default", "color");
+            return_hyper.setDimensions(1, z, t);
 
         }else{
             return_hyper = HyperStackConverter.toHyperStack(return_imp, 1, z, t, "default", "color");
@@ -233,6 +271,7 @@ public class FRETratioFxUI extends AnchorPane implements WindowListener {
         processingImage = mainImage.duplicate();
         mainImage.setRoi(r);
         processingImage.setRoi(r);
+        processingImage.setDimensions(chSize, zSize, tSize);
 
         if(mouseEvent.getClickCount() == 1) {
 
@@ -261,21 +300,22 @@ public class FRETratioFxUI extends AnchorPane implements WindowListener {
 
             int selectedIndex = cbFormula.getSelectionModel().getSelectedIndex();
             fret_imp = fretCalc(selectedIndex);
+
             fret_imp.setCalibration(mainImage.getCalibration());
             fret_imp.setFileInfo(mainImage.getFileInfo());
 
             if (fret_imp.isVisible() == false) {
                 fret_imp.show();
                 fret_imp.setDisplayRange(0, fret_imp.getProcessor().getMax());
-
-                System.out.println(fret_imp.isHyperStack());
-
                 fret_imp.setRoi(r);
             }
 
-            LutSelectorFRET lut_fret = new LutSelectorFRET();
-            lut_fret.setImagePlus(fret_imp);
-            lut_fret.createPanel();
+
+            if(fret_imp.getProcessor().isGrayscale()) {
+                LutSelectorFRET lut_fret = new LutSelectorFRET();
+                lut_fret.setImagePlus(fret_imp);
+                lut_fret.createPanel();
+            }
 
         }else{
             System.out.println("Continuous click");
@@ -306,7 +346,9 @@ public class FRETratioFxUI extends AnchorPane implements WindowListener {
             this.removeListener();
             if (bname.compareTo("Projection") == 0) {
 
-                imp_buffer = mainImage.duplicate();
+                //imp_buffer = mainImage.duplicate();
+                imp_buffer = new Duplicator().run(mainImage);//1.52n dulicate()対策
+
                 //mainImage.setZ(mainImage.getNSlices()); //projection imageをmainImageにsetImageしたときに反映されない不具合があるため -> 1.52h21で解消
                 imp_max = this.projectionHyper(mainImage);
                 mainImage.setImage(imp_max);
@@ -318,7 +360,8 @@ public class FRETratioFxUI extends AnchorPane implements WindowListener {
 
             } else if (bname.compareTo("Split-Z") == 0) {
 
-                imp_max = mainImage.duplicate();
+                //imp_max = mainImage.duplicate();
+                imp_max = new Duplicator().run(mainImage); //1.52n duplicate()対策
 
                 mainImage.setImage(imp_buffer);
 
@@ -429,6 +472,8 @@ public class FRETratioFxUI extends AnchorPane implements WindowListener {
         Platform.setImplicitExit(false);
 
     }
+
+
 
 
     @Override

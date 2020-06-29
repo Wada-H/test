@@ -1,6 +1,7 @@
 package hw.fretratiofx;
 
 import ij.ImagePlus;
+import ij.plugin.Duplicator;
 import ij.process.ImageProcessor;
 
 
@@ -14,7 +15,8 @@ public class AutoEnhanceFRET {
 	public void enhance(ImagePlus imp){
 		//imp.setSlice(1);
 
-		ImagePlus roi_imp = imp.duplicate();
+		//ImagePlus roi_imp = imp.duplicate();
+		ImagePlus roi_imp = new Duplicator().run(imp); // IJ 1.52n対策
 
 		int t = imp.getNFrames();
 		int c = imp.getNChannels();

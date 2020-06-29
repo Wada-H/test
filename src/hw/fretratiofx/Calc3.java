@@ -5,14 +5,10 @@ import ij.process.ImageProcessor;
 
 public class Calc3 extends Calc {
 
-    double max_ratio = 1.0;
-    double min_ratio = 0.0;
-
-
     @Override
-    public void setRatio(double min, double max){
-        min_ratio = min;
-        max_ratio = max;
+    public String getTitle(){
+        title = "_min" + min_ratio + "_max" + max_ratio;
+        return title;
     }
 
     @Override
