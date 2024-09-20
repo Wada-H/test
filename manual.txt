@@ -1,0 +1,64 @@
+FRETratioFx
+ver. 20191115
+
+AutoCutB
+各画像の一番多い輝度値（ほとんど場合はバックグラウンドノイズ）を中央値もしくは平均値よりもとめ、そのピークにExt.valueを掛け合わせた輝度を画像全体から引く。
+
+Subtract background from self slice
+true : AutoCutBを各画像毎に行う, false : 1枚目の画像で算定した値を全ての画像から引く
+
+AutoEnhance
+1枚目の画像の輝度の平均値を基準としてそれ以降の画像の平均輝度をこれに合わせる
+
+Obtain(divide 100 <=) then ch2 / (ch1 + ch2) * bitMaxValue
+ch2 / (ch1 + ch2) * bitMaxValuの計算をする。
+各画像のどちらも輝度がbitMaxVlue/100未満であればratioを0とする。例 8bit画像であれば255/100 = 2.55 -> 3未満の値で算出したraitoは0とする。
+
+ch2 / ch1 * 100 * exValue
+ch2をch1で割って100を掛けた値にさらにexVlueを掛け合わせて輝度を調整した画像を作る
+
+Like IMD(should set Lut 'LIMD')
+IMD形式の8bit画像を作る。
+この画像を正しく表現するために、LUTをLIMDにする必要がある。
+IMD : ratioをMin-Max間で8色に分け、さらに輝度を32階調として表現する方法
+
+
+IMDwithHSB
+IMD形式をHSBで表現する方法。
+ratioをMin-Max間をHSBのHue(紫-赤, 0.25-1.0)で無段階で表現。
+輝度をそのシリーズにおける最大輝度との割合によってHSBのSaturationとBrightnessの値として(0.0-1.0)で無段階で表現。
+
+Auto : そのシリーズの最小ratioと最大ratioを利用する
+Manual : 任意の範囲のraitoを最大値、最小値とする。この時はみ出したratioについては最小、最大として表現する。
+C : 無段階でHueを分けているが、この値による分割を行う。例 : 8色に分けたい場合は8とする。
+
+
+
+ChatGPT
+FRETratioFx
+ver. 20191115
+
+AutoCutB
+Subtract from the entire image the luminance value of the most common luminance value in each image (in most cases background noise) from the median or average, and multiply that peak by the Ext. value.
+
+Subtract background from self slice
+true: Perform AutoCutB for each image individually, false: Subtract the value calculated from the first image from all images.
+
+AutoEnhance
+Adjust the average brightness of subsequent images to match the average brightness of the first image.
+
+Obtain (divide 100 <=) then ch2 / (ch1 + ch2) * bitMaxValue
+Perform the calculation of ch2 / (ch1 + ch2) * bitMaxValue. If the brightness of both images is less than bitMaxValue/100, the ratio is set to 0. For example, for an 8-bit image, 255/100 = 2.55 -> If the value is less than 3, the calculated raito is set to 0.
+
+ch2 / ch1 * 100 * exValue
+Create an image by dividing ch2 by ch1, multiplying by 100, and then adjusting the brightness further by multiplying by an exValue.
+
+Like IMD (should set Lut 'LIMD')
+Create an 8-bit image in IMD format. To correctly represent this image, the LUT should be set to LIMD. IMD: A method to divide the ratio between Min-Max into 8 colors, further expressing the brightness in 32 gradations.
+
+IMDwithHSB
+A method to express the IMD format in HSB. The ratio is expressed in a continuous scale in HSB's Hue (purple-red, 0.25-1.0) between Min-Max. Brightness is expressed in a continuous scale for Saturation and Brightness in HSB, based on the proportion to the maximum brightness in that series (0.0-1.0).
+
+Auto: Use the minimum and maximum ratio of that series.
+Manual: Set an arbitrary range as the maximum and minimum ratio values. Ratios outside this range are expressed as the minimum or maximum.
+C: Although the Hue is divided continuously, this value determines the division. For example, to divide into 8 colors, set it to 8.

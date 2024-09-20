@@ -10,6 +10,10 @@ import java.util.stream.IntStream;
  * 2019.04.03
  *  ImageJ 1.52nのduplicate()仕様変更による修正
  *
+ * 20240905
+ *  離散的な輝度分布の場合うまくmodを拾えない問題を範囲をとることで緩和。
+ * 	8bit > 3点, 16bit > 11点
+ *
  */
 
 public class AutoCut {
@@ -17,6 +21,8 @@ public class AutoCut {
     ImagePlus imp;
     Roi roi;
     boolean selfSlice = true;
+
+    int stepSize = 1; //自身を中心とした半径とする > 5ならば前後5を足した11
 
     public AutoCut(ImagePlus imageplus){
         imp = imageplus;
@@ -32,6 +38,9 @@ public class AutoCut {
         int c = imp.getNChannels();
         int z = imp.getNSlices();
 
+        if(imp.getBitDepth() == 16){
+            stepSize = 5;
+        }
 
         int stackIndex = (current_t - 1) * c * z + ((current_c - 1) * z) + (current_z);
 
@@ -40,7 +49,7 @@ public class AutoCut {
         //* 並び順が違う場合もok?
         final int peak_value;
         if(!selfSlice){
-            peak_value = getSubtractionValue(currentSliceImage.getProcessor(), selected_method_id);
+            peak_value = getSubtractionValue(currentSliceImage.getProcessor(), selected_method_id, stepSize);
         }else{
             peak_value = 0;
         }
@@ -56,7 +65,7 @@ public class AutoCut {
 
             if (selfSlice) {
                 ImagePlus buffImage = this.duplicate1slice(imp, (i + 1));
-                p_value = getSubtractionValue(buffImage.getProcessor(), selected_method_id);
+                p_value = getSubtractionValue(buffImage.getProcessor(), selected_method_id, stepSize);
             } else {
                 //何もしない？
             }
@@ -74,7 +83,7 @@ public class AutoCut {
         selfSlice = b;
     }
 
-    private int getSubtractionValue(ImageProcessor ip, int option){
+    private int getSubtractionValue(ImageProcessor ip, int option, int stepSize){ //stepSize > 0
         //option = 0 : average, 1 : mode
         int return_value = 0;
 
@@ -94,29 +103,21 @@ public class AutoCut {
             return_value = (int)Math.round(buff_value);
         }else if(option == 1){ //最頻出値
 
-
-            int[] hist_array = new int[65536];
+            int[] hist_array = ip.getHistogram();
             int max_value = 0;
-
-            for(int y = 0; y < height; y++){
-                for(int x = 0; x < width; x++){
-                    int value = ip.getPixel(x, y);
-                    hist_array[value] += 1;
-                }
-            }
 
             //int limit = (hist_array.length / depth) - 1; // backgroundとして認める最大値 ->これにすると輝度が高い方にシフトしたような場合に対応できない。
             int limit = hist_array.length;
 
-            for(int i = 1; i < limit; i++){ //0を無視するため i = 1から
-                int value = hist_array[i];
+            for(int i = (1 + stepSize); i < (limit - stepSize); i++){ //0と65536を無視するため i = 2から
+
+                int value = IntStream.range((i - stepSize), (i + stepSize)).map(n -> hist_array[n]).sum();
                 if(max_value < value){
                     max_value = value;
                     return_value = i;
                 }
             }
         }
-        //System.out.println("getp:" + return_value);
         return return_value;
     }
 

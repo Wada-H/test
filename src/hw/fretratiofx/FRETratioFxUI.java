@@ -5,13 +5,11 @@ import ij.ImagePlus;
 import ij.gui.Roi;
 import ij.plugin.Duplicator;
 import ij.plugin.HyperStackConverter;
-import ij.process.ImageProcessor;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.embed.swing.JFXPanel;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,10 +22,6 @@ import javafx.scene.layout.Pane;
 import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 public class FRETratioFxUI extends AnchorPane implements WindowListener {
 
@@ -310,13 +304,6 @@ public class FRETratioFxUI extends AnchorPane implements WindowListener {
                 fret_imp.setRoi(r);
             }
 
-
-            if(fret_imp.getProcessor().isGrayscale()) {
-                LutSelectorFRET lut_fret = new LutSelectorFRET();
-                lut_fret.setImagePlus(fret_imp);
-                lut_fret.createPanel();
-            }
-
         }else{
             System.out.println("Continuous click");
             mainImage.getWindow().requestFocus();
@@ -468,6 +455,7 @@ public class FRETratioFxUI extends AnchorPane implements WindowListener {
 
 
     public void close(){
+
 
         Platform.setImplicitExit(false);
 

@@ -26,17 +26,16 @@ Calcボタンを押すたびに元画像と、式をもとに新しい画像を�
 20191114 T軸に対して並列に計算することで処理速度を改善。
     *問題点発覚 - stack全体としての最大輝度最小輝度をみる必要があるのではないかということ。
         ->色々試すも結局ちらつくので保留。あとはHSBprojection後に全体の輝度を揃えるようなやりかたか。(AutoEnhance的な)
-
+20240905 AutoCutBのmod判定の方法改善と、Channel&Lutがcloseしない問題の解消。
+20240913 Lutselectorの改良。ただし、ImageJ側でフォーカスの扱いがうまくいかない場合に変なことになる。これはかなり頻繁に起こる。pluginが原因の可能性もあるので注意
 
 @author    hwada
 
 */
 
 
-
-
-
 import hw.fretratiofx.FRETratioFxUI;
+import hw.fretratiofx.LutSelectorFRET;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.WindowManager;
@@ -50,9 +49,10 @@ import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
+
 public class FRETratioFx_ extends PlugInFrame implements WindowListener {
 
-    static String version = "20191115";
+    static String version = "20240913";
     FRETratioFxUI ui;
 
     ImagePlus mainImage; // 元画像 または選択中の画像
@@ -82,6 +82,7 @@ public class FRETratioFx_ extends PlugInFrame implements WindowListener {
             this.getBasicInformation(mainImage);
 
             this.createPanelFx();
+            LutSelectorFRET lutl = new LutSelectorFRET();//起動はするが、channel違いの場合エラーが出る。当たり前だが、、、
 
         }else{
             IJ.noImage();
